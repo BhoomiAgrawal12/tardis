@@ -52,7 +52,23 @@ Set up
 
 In this step, ASV configures TARDIS through Mamba.
 Packages that use TARDIS are downloaded here.
-These packages are mainly found in this ``env.yml`` file that can be found in the `tardisbase repository <https://github.com/tardis-sn/tardisbase/blob/master/env.yml>`_.
+These packages are defined in the ``env.yml`` file in the repository root.
+
+.. note::
+
+    **About the env.yml file:**
+    
+    ASV does not support conda lockfiles directly. To ensure reproducible benchmarks,
+    the ``env.yml`` file contains pinned exact versions extracted from ``conda-lock.yml``.
+    This prevents dependency version changes from introducing noise in benchmark results.
+    
+    The ``env.yml`` file is **auto-generated** - do not edit it manually. To regenerate
+    after updating ``conda-lock.yml``, run:
+    
+    .. code-block:: shell
+    
+        > python generate_benchmark_env.py
+
 The environment is also configured for ASV to execute benchmarks
 and store the results through the ``asv.conf.json`` file.
 
@@ -87,3 +103,33 @@ Visualization
 There are two ways to view the data. The simplest thing is
 to execute the ``asv preview`` command, creating a local web server.
 The second is to run a local web server of your choice.
+
+
+Maintaining the Benchmark Environment
+======================================
+
+Why Pinned Versions?
+---------------------
+
+The benchmark environment uses pinned package versions for reproducibility:
+
+* **Performance consistency:** Package updates can change performance characteristics
+* **Noise reduction:** Pinned versions eliminate dependency changes as a variable
+* **Clear attribution:** Performance changes can be attributed to TARDIS code modifications
+
+Updating the Environment
+-------------------------
+
+When ``conda-lock.yml`` is updated, regenerate ``env.yml`` to keep benchmarks synchronized:
+
+.. code-block:: shell
+
+    > python generate_benchmark_env.py
+
+This extracts pinned versions from ``conda-lock.yml`` (linux-64 platform) and creates
+a new ``env.yml`` file that ASV can use.
+
+.. warning::
+
+    Never edit ``env.yml`` manually - it will be overwritten when regenerated.
+    All environment changes should be made through ``conda-lock.yml``.
